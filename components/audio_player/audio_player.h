@@ -77,7 +77,7 @@ class AudioMediaPlayer : public Component, public media_player::MediaPlayer {
   media_player::MediaPlayerTraits get_traits() override;
   bool is_muted() const override { return this->muted_; }
 
-  void play(const std::string &url);
+  bool play(const std::string &url);
   void stop();
 
   void set_output(AudioOutput *out) { this->out_ = out; }
