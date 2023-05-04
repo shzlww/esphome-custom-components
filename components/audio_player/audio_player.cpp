@@ -71,7 +71,10 @@ void AudioMediaPlayer::loop() {
 
 void AudioMediaPlayer::control(const media_player::MediaPlayerCall &call) {
   if (call.get_media_url().has_value()) {
-    this->play(call.get_media_url().value());
+    this->high_freq_.start();
+    if(!this->play(call.get_media_url().value())) {
+      this->high_freq_.stop();
+    }
   }
   if (call.get_volume().has_value()) {
     ESP_LOGD(TAG, "volume set %.2f", call.get_volume().value());
@@ -154,13 +157,13 @@ void AudioMediaPlayer::stop() {
 }
 
 
-void AudioMediaPlayer::play(const std::string &url) {
+bool AudioMediaPlayer::play(const std::string &url) {
   stop();
 
   ESP_LOGD(TAG, "play url %s", url.c_str());
   if (url.rfind("http://", 0) != 0) {
     ESP_LOGE(TAG, "Unsupported protocol");
-    return;
+    return false;
   }
 
   CustomAudioFileSourceHTTPStream *http_stream = new CustomAudioFileSourceHTTPStream(url.c_str());
@@ -182,7 +185,7 @@ void AudioMediaPlayer::play(const std::string &url) {
 
   this->file_ = http_stream;
   this->buffer_ = new AudioFileSourceBuffer(file_, buffer_size_);
-  this->generator_ = new AudioGeneratorWAV();
+  //this->generator_ = new AudioGeneratorWAV();
 
   file_->RegisterStatusCB(StatusCallback, (void *) "file");
   buffer_->RegisterStatusCB(StatusCallback, (void *) "buffer");
@@ -193,11 +196,12 @@ void AudioMediaPlayer::play(const std::string &url) {
     stop();
     this->state = media_player::MEDIA_PLAYER_STATE_IDLE;
     this->publish_state();
-    return;
+    return false;
   }
 
   this->state = media_player::MEDIA_PLAYER_STATE_PLAYING;
   this->publish_state();
+  return true;
 }
 
 void AudioMediaPlayer::mute_() {
