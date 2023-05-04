@@ -55,18 +55,15 @@ void AudioMediaPlayer::loop() {
   if (!this->pause_ && generator_->loop()) {
     return;
   }
-  generator_->stop();
-  if (buffer_ != NULL) {
-    delete buffer_;
-    buffer_ = NULL;
+  //处于运行状态但是播放循环已结束，停止播放并发布状态
+  if (generator_->isRunning()) {
+    if(!generator_->loop()) {
+       this->stop();
+       this->state = media_player::MEDIA_PLAYER_STATE_IDLE;
+       this->publish_state();
+       return;
+    }
   }
-  if (file_ != NULL) {
-    delete file_;
-    file_ = NULL;
-  }
-
-  this->state = media_player::MEDIA_PLAYER_STATE_IDLE;
-  this->publish_state();
 }
 
 void AudioMediaPlayer::control(const media_player::MediaPlayerCall &call) {
