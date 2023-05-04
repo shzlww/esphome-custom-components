@@ -138,6 +138,7 @@ media_player::MediaPlayerTraits AudioMediaPlayer::get_traits() {
 };
 
 void AudioMediaPlayer::stop() {
+  this->high_freq_.stop();
   if (generator_ != NULL) {
     if (generator_->isRunning()) {
       generator_->stop();
