@@ -105,6 +105,7 @@ class AudioMediaPlayer : public Component, public media_player::MediaPlayer {
   AudioOutput *out_{NULL};
   Volume *volume_contorller_{NULL};
   Dumpable *ext_info_{NULL};
+  HighFrequencyLoopRequester high_freq_; //开启高频loop,修复播放音频卡顿的bug
 };
 
 }  // namespace audio_player
