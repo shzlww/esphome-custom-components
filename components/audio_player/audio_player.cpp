@@ -50,6 +50,13 @@ void AudioMediaPlayer::loop() {
     return;
   }
   if (!generator_->isRunning()) {
+    if(this->state != media_player::MEDIA_PLAYER_STATE_IDLE) {
+       ESP_LOGD(TAG, "audio done,stop it 0!");
+       this->stop();
+       this->state = media_player::MEDIA_PLAYER_STATE_IDLE;
+       this->publish_state();
+       return;
+    }
     return;
   }
   if (!this->pause_ && generator_->loop()) {
@@ -58,6 +65,7 @@ void AudioMediaPlayer::loop() {
   //处于运行状态但是播放循环已结束，停止播放并发布状态
   if (generator_->isRunning()) {
     if(!generator_->loop()) {
+       ESP_LOGD(TAG, "audio done,stop it!");
        this->stop();
        this->state = media_player::MEDIA_PLAYER_STATE_IDLE;
        this->publish_state();
