@@ -175,6 +175,7 @@ bool AudioMediaPlayer::play(const std::string &url) {
   CustomAudioFileSourceHTTPStream *http_stream = new CustomAudioFileSourceHTTPStream(url.c_str());
   
   std::string content_type = http_stream->contentType();
+  ESP_LOGD(TAG, "url content_type is[%s]", content_type.c_str());
   if (content_type.empty()) {
     ESP_LOGE(TAG, "http: no Content-Type");
     generator_ = new AudioGeneratorWAV();
